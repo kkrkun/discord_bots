@@ -268,4 +268,4 @@ client.on("messageCreate", async (message) => {
 });
 
 // Discordにログイン
-client.login(TOKEN);
+client.login(process.env.TOKEN);
