@@ -4,7 +4,8 @@ http.createServer(function(request, response)
 {
 	response.writeHead(200, {'Content-Type': 'text/plain'});
 	response.end('Bot is online!');
-}).listen(8000);
+}).listen(3000);
+
 console.log("Botを起動しました。");
 
 // Discord.jsクライアントの初期化
@@ -26,8 +27,8 @@ const client = new Client({
     ],
 });
 
-const VCID = "1064461324135960617";
-const VCID2 = "1064461356574703626";
+const VCID = "1300487810893090895";
+const VCID2 = "1300495034851786784";
 const VCID3 = "1165551153791127562";
 const VCID4 = "1165551032009490482";
 const EXEMPT_IDS = new Set(["935599318738567219", "518899666637553667", "943931882138136586"]);
@@ -99,9 +100,9 @@ async function handleMoveCommand(message, fromChannelId, toChannelId, mute, move
 // メッセージの受信イベントの処理
 client.on("messageCreate", async (message) => {
     if (message.content.startsWith("mcid:")) {
-        if (message.channel.id !== "1064310706469605536") return;
+        if (message.channel.id !== "1300489104005529701") return;
         if (!message.member.bannable) return message.channel.send('botがあなたのニックネームを変更することができません');
-        await message.member.roles.add('1064310860081807471');
+        await message.member.roles.add('1300489571968221285');
         await message.guild.members.cache.get(message.author.id).setNickname(message.content.slice(5));
         message.reply('ロールを付与しました。');
     }
