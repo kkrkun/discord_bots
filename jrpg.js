@@ -42,30 +42,40 @@ async function processMembers(members, action) {
 
 // ミュートコマンドの処理
 async function handleMuteCommand(message, mute, channelId, movedSet, excludeMoved = true) {
-    const voiceChannel = message.guild.channels.cache.get(channelId);
-    if (!voiceChannel || voiceChannel.members.size === 0) {
-        const embed = new EmbedBuilder()
-            .setTitle('VCに誰もいないため実行できませんでした。')
-            .setColor('#f54242');
-        return message.channel.send({ embeds: [embed] });
-    }
-
-    const membersToProcess = excludeMoved
-        ? Array.from(voiceChannel.members.values()).filter(member => mute || !movedSet.has(member.id))
-        : Array.from(voiceChannel.members.values());
-
-    const result = await processMembers(membersToProcess, member => 
-        member.voice.setMute(mute).then(() => member.displayName)
-    );
-
+const voiceChannel = message.guild.channels.cache.get(channelId);
+if (!voiceChannel || voiceChannel.members.size === 0) {
     const embed = new EmbedBuilder()
-        .setTitle(`ミュート${mute ? '' : '解除'}が完了しました。`)
-        .addFields(
-            { name: `成功した人`, value: result.ok.join(', '), inline: true },
-            { name: `失敗した人`, value: result.no.join(', '), inline: true }
-        )
-        .setColor('#48f542');
-    message.channel.send({ embeds: [embed] });
+        .setTitle('VCに誰もいないため実行できませんでした。')
+        .setColor('#f54242');
+    return message.channel.send({ embeds: [embed] });
+}
+
+// VC内のメンバーを取得し、ミュートしていない人を先に処理するようにソート
+const membersToProcess = excludeMoved
+    ? Array.from(voiceChannel.members.values()).filter(member => mute || !movedSet.has(member.id))
+    : Array.from(voiceChannel.members.values());
+
+// ミュートしていない人を先に、ミュートしている人を後にソート
+membersToProcess.sort((a, b) => {
+    const aMuted = a.voice.serverMute || a.voice.selfMute;
+    const bMuted = b.voice.serverMute || b.voice.selfMute;
+    return aMuted - bMuted; // false (0) が先、true (1) が後になる
+});
+
+const result = await processMembers(membersToProcess, member => 
+    member.voice.setMute(mute).then(() => member.displayName)
+);
+
+const embed = new EmbedBuilder()
+    .setTitle(`ミュート${mute ? '' : '解除'}が完了しました。`)
+    .addFields(
+        { name: `成功した人`, value: result.ok.length ? result.ok.join(', ') : 'なし', inline: true },
+        { name: `失敗した人`, value: result.no.length ? result.no.join(', ') : 'なし', inline: true }
+    )
+    .setColor('#48f542');
+
+message.channel.send({ embeds: [embed] });
+
 }
 
 // 移動コマンドの処理
