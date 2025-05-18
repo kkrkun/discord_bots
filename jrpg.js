@@ -58,13 +58,12 @@ const membersToProcess = excludeMoved
 // ミュートしていない人を先に、ミュートしている人を後にソート
     membersToProcess.sort((a, b) => {
         if (mute) {
-            const aMuted = a.voice.serverMute || a.voice.selfMute;
-            const bMuted = b.voice.serverMute || b.voice.selfMute;
+            const aMuted = (a.voice?.serverMute || a.voice?.selfMute) ? 1 : 0;
+            const bMuted = (b.voice?.serverMute || b.voice?.selfMute) ? 1 : 0;
             return aMuted - bMuted; // false (0) が先、true (1) が後になる
         } else {
-            // ミュート解除するとき：セルフミュートしていない人を先に
-            const aSelfMuted = a.voice.selfMute;
-            const bSelfMuted = b.voice.selfMute;
+            const aSelfMuted = a.voice?.selfMute ? 1 : 0;
+            const bSelfMuted = b.voice?.selfMute ? 1 : 0;
             return aSelfMuted - bSelfMuted;
         }
     });
