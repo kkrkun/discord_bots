@@ -3,7 +3,7 @@ http.createServer(function(request, response)
 {
 	response.writeHead(200, {'Content-Type': 'text/plain'});
 	response.end('Bot is online!');
-}).listen(8000);
+}).listen(3000);
 
 console.log("Botを起動しました。");
 require('./jrpg.js');
