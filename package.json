@@ -1,9 +1,10 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "node index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +17,7 @@
     "node-fetch": "^3.2.6"
   },
   "devDependencies": {
-    "node": "^20.10.0"
+    "node": "^20.11.0"
   },
   "description": ""
 }
