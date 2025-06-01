@@ -178,9 +178,17 @@ client.on("messageCreate", async (message) => {
         if (voiceChannel) {
             const targetMember = voiceChannel.members.find(member => member.nickname === targetNickname);
             if (targetMember) {
-                await targetMember.voice.setMute(mute);
-                await targetMember.voice.setChannel(toChannelId);
-                movedSet.add(targetMember.id);
+                if (targetMember.voice.channel) {
+                    try {
+                        await targetMember.voice.setMute(mute);
+                        await targetMember.voice.setChannel(toChannelId);
+                        movedSet.add(targetMember.id);
+                    } catch (error) {
+                        console.error(`Error moving member ${targetMember.id}:`, error);
+                    }
+                } else {
+                    console.log(`Skipping ${targetMember.id}: not in a voice channel.`);
+                }
             }
         }
     }
