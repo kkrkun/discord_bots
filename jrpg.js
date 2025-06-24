@@ -136,21 +136,7 @@ client.on("messageCreate", async (message) => {
         movedMembers.clear(); // リセット
     }
 
-    if (message.content === "!?m on" || message.content === "!?[人狼RPG] ☽夜☽") {
-        await handleMuteCommand(message, true, VCID3, movedMembersAlt);
-    }
-
-    if (message.content === "!?m off" || message.content === "!?[人狼RPG] ☀昼☀") {
-        await handleMuteCommand(message, false, VCID3, movedMembersAlt);
-    }
-
-    if (message.content === "!?move all" || message.content === "!?[人狼RPG] ゲーム終了") {
-        await handleMoveCommand(message, VCID4, VCID3, undefined, movedMembersAlt);
-        await handleMuteCommand(message, false, VCID3, movedMembersAlt, false); // ミュート解除時に移動されたメンバーも含む
-        movedMembersAlt.clear(); // リセット
-    }
-
-    if (message.content.startsWith("!m ") || message.content.startsWith("!moff ") || message.content.startsWith("!?m ") || message.content.startsWith("!?moff ")) {
+    if (message.content.startsWith("!m ") || message.content.startsWith("!moff ")) {
         const [command, targetNickname] = message.content.split(' ');
         const mute = !command.includes('moff');
         const VC = !command.startsWith('!?');
@@ -168,7 +154,7 @@ client.on("messageCreate", async (message) => {
         }
     }
 
-    if (message.content.startsWith("!move ") || message.content.startsWith("!move2 ") || message.content.startsWith("!?move ") || message.content.startsWith("!?move2 ")) {
+    if (message.content.startsWith("!move ") || message.content.startsWith("!move2 ")) {
         const [command, targetNickname] = message.content.split(' ');
         const fromChannelId = command.startsWith("!?") ? (command.includes("move2") ? VCID4 : VCID3) : (command.includes("move2") ? VCID2 : VCID);
         const toChannelId = command.startsWith("!?") ? (command.includes("move2") ? VCID3 : VCID4) : (command.includes("move2") ? VCID : VCID2);
