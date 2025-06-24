@@ -7,4 +7,5 @@ http.createServer(function(request, response)
 
 console.log("Botを起動しました。");
 require('./jrpg.js');
+require('./jrpg2.js');
 require('./aooni.js');
