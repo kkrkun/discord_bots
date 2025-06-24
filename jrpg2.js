@@ -114,27 +114,6 @@ client.on("messageCreate", async (message) => {
         VCID = "1064461324135960617";
         VCID2 = "1064461356574703626";
     }
-    if (message.content.startsWith("mcid:")) {
-        if (message.channel.id !== "1064310706469605536") return;
-        if (!message.member.bannable) return message.channel.send('botがあなたのニックネームを変更することができません');
-        await message.member.roles.add('1064310860081807471');
-        await message.guild.members.cache.get(message.author.id).setNickname(message.content.slice(5));
-        message.reply('ロールを付与しました。');
-    }
-
-    if (message.content === "!m on" || message.content === "![人狼RPG] ☽夜☽") {
-        await handleMuteCommand(message, true, VCID, movedMembers);
-    }
-
-    if (message.content === "!m off" || message.content === "![人狼RPG] ☀昼☀") {
-        await handleMuteCommand(message, false, VCID, movedMembers);
-    }
-
-    if (message.content === "!move all" || message.content === "![人狼RPG] ゲーム終了") {
-        await handleMoveCommand(message, VCID2, VCID, undefined, movedMembers);
-        await handleMuteCommand(message, false, VCID, movedMembers, false); // ミュート解除時に移動されたメンバーも含む
-        movedMembers.clear(); // リセット
-    }
 
     if (message.content === "!?m on" || message.content === "!?[人狼RPG] ☽夜☽") {
         await handleMuteCommand(message, true, VCID3, movedMembersAlt);
@@ -150,7 +129,7 @@ client.on("messageCreate", async (message) => {
         movedMembersAlt.clear(); // リセット
     }
 
-    if (message.content.startsWith("!m ") || message.content.startsWith("!moff ") || message.content.startsWith("!?m ") || message.content.startsWith("!?moff ")) {
+    if (message.content.startsWith("!?m ") || message.content.startsWith("!?moff ")) {
         const [command, targetNickname] = message.content.split(' ');
         const mute = !command.includes('moff');
         const VC = !command.startsWith('!?');
@@ -168,7 +147,7 @@ client.on("messageCreate", async (message) => {
         }
     }
 
-    if (message.content.startsWith("!move ") || message.content.startsWith("!move2 ") || message.content.startsWith("!?move ") || message.content.startsWith("!?move2 ")) {
+    if (message.content.startsWith("!?move ") || message.content.startsWith("!?move2 ")) {
         const [command, targetNickname] = message.content.split(' ');
         const fromChannelId = command.startsWith("!?") ? (command.includes("move2") ? VCID4 : VCID3) : (command.includes("move2") ? VCID2 : VCID);
         const toChannelId = command.startsWith("!?") ? (command.includes("move2") ? VCID3 : VCID4) : (command.includes("move2") ? VCID : VCID2);
@@ -192,110 +171,7 @@ client.on("messageCreate", async (message) => {
             }
         }
     }
-
-    // !syabekuraコマンドの処理
-    if (message.content.startsWith("!syabekura_off ")) {
-        const targetNickname = message.content.slice(15);
-        const voiceChannel = message.guild.channels.cache.get(VCID);
-        if (voiceChannel) {
-            const targetMember = voiceChannel.members.find(member => member.nickname === targetNickname);
-            if (targetMember) {
-                await Promise.all([
-                    targetMember.voice.setMute(false),
-                    targetMember.voice.setDeaf(false)
-                ]);
-            }
-        }
-    }
-
-    if (message.content.startsWith("!syabekura_death ")) {
-        const targetNickname = message.content.slice(17);
-        const voiceChannel = message.guild.channels.cache.get(VCID);
-        if (voiceChannel) {
-            const targetMember = voiceChannel.members.find(member => member.nickname === targetNickname);
-            if (targetMember) {
-                await Promise.all([
-                    targetMember.voice.setMute(true),
-                    targetMember.voice.setDeaf(false)
-                ]);
-                deathList.add(targetMember.id);
-            }
-        }
-    }
-
-    if (message.content.startsWith("!syabekura_kari ")) {
-        deathList.clear();
-        const targetNickname = message.content.slice(16);
-        const voiceChannel = message.guild.channels.cache.get(VCID);
-        if (voiceChannel) {
-            const targetMember = voiceChannel.members.find(member => member.nickname === targetNickname);
-            if (targetMember) {
-                await Promise.all([
-                    targetMember.voice.setMute(false),
-                    targetMember.voice.setDeaf(false)
-                ]);
-                deathList.add(targetMember.id);
-            }
-        }
-    }
-
-    if (message.content === "!syabekura on") {
-        const voiceChannel = message.guild.channels.cache.get(VCID);
-        if (voiceChannel && voiceChannel.members.size > 0) {
-            await Promise.all(Array.from(voiceChannel.members.values()).map(member => {
-                if (!deathList.has(member.id)) {
-                    return Promise.all([
-                        member.voice.setMute(true),
-                        member.voice.setDeaf(true)
-                    ]);
-                }
-                return null;
-            }));
-        } else {
-            const embed = new EmbedBuilder()
-                .setTitle('VCに誰もいないため実行できませんでした。')
-                .setColor('#f54242');
-            message.channel.send({ embeds: [embed] });
-        }
-    }
-
-    if (message.content === "!syabekura list-reset") {
-        deathList.clear();
-    }
-
-    if (message.content === "!syabekura off") {
-        const voiceChannel = message.guild.channels.cache.get(VCID);
-        if (voiceChannel && voiceChannel.members.size > 0) {
-            await Promise.all(Array.from(voiceChannel.members.values()).map(member => 
-                Promise.all([
-                    member.voice.setMute(false),
-                    member.voice.setDeaf(false)
-                ])
-            ));
-        } else {
-            const embed = new EmbedBuilder()
-                .setTitle('VCに誰もいないため実行できませんでした。')
-                .setColor('#f54242');
-            message.channel.send({ embeds: [embed] });
-        }
-        deathList.clear();
-    }
-
-    if (message.content === "!m me") {
-        try {
-            await message.member.voice.setMute(false);
-            const embed = new EmbedBuilder()
-                .setTitle('ミュート解除が完了しました。')
-                .setColor('#48f542');
-            message.reply({ embeds: [embed] });
-        } catch {
-            const embed = new EmbedBuilder()
-                .setTitle('VCにいないため実行できませんでした。')
-                .setColor('#f54242');
-            message.reply({ embeds: [embed] });
-        }
-    }
 });
 
 // Discordにログイン
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN3);
